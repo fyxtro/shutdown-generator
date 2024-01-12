@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Shutdown Command Generator</title>
+    <!-- Include flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <style>
+      /* Algemene styling */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+      }
+
+      h1 {
+        margin-top: 50px;
+        font-size: 2.5em;
+      }
+
+      form {
+        margin: 20px;
+      }
+
+      label,
+      input,
+      select {
+        margin-bottom: 20px;
+      }
+
+      /* Knop styling */
+      .button {
+        padding: 15px 30px;
+        font-size: 18px;
+        cursor: pointer;
+        background-color: #555;
+        color: #fff;
+        border: none;
+        border-radius: 25px;
+        /* Afgeronde hoeken */
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        /* Hover animatie */
+      }
+
+      /* Hover animatie */
+      .button:hover {
+        background-color: #777;
+        transform: scale(1.05);
+        /* Vergroot de knop iets */
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Shutdown Command Generator</h1>
+    <form id="shutdownForm">
+      <!-- Tijd in seconden -->
+      <label for="time">Tijd (in seconden):</label>
+      <input type="number" id="time" name="time">
+      <br>
+      <br>
+      <!-- Time Picker Input -->
+      <label for="timePicker">Selecteer tijd:</label>
+      <input type="text" id="timePicker" placeholder="Select Time">
+      <br>
+      <br>
+      <!-- Snelle tijdselectie knoppen -->
+      <button type="button" onclick="setTime(600)">10 minuten</button>
+      <button type="button" onclick="setTime(3600)">1 uur</button>
+      <br>
+      <br>
+      <label for="action">Actie:</label>
+      <select id="action" name="action">
+        <option value="shutdown">Afsluiten</option>
+        <option value="restart">Herstarten</option>
+      </select>
+      <br>
+      <br>
+      <input type="checkbox" id="force" name="force">
+      <label for="force">Forceer afsluiten (/f)</label>
+      <br>
+      <br>
+      <label for="message">Bericht:</label>
+      <input type="text" id="message" name="message">
+      <br>
+      <br>
+      <input type="button" class="button" value="Genereer Commando" onclick="generateCommand()">
+    </form>
+    <h2>Uw Commando:</h2>
+    <p id="commandOutput"></p>
+    <script>
+	  function setTime(seconds) {
+        document.getElementById("time").value = seconds;
+      }
+      // Initialize flatpickr
+      flatpickr("#timePicker", {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+		time_24hr: true,
+        onChange: function(selectedDates, dateStr, instance) {
+          let selectedTime = selectedDates[0];
+          let currentTime = new Date();
+          let timeDifference = Math.floor((selectedTime - currentTime) / 1000);
+          if (timeDifference < 0) {
+            // If the time seems to be 'in the past', add 24 hours (for the next day)
+            timeDifference += 24 * 3600;
+          }
+          document.getElementById("time").value = timeDifference;
+        }
+      });
+
+      function generateCommand() {
+        let time = document.getElementById("time").value;
+        let action = document.getElementById("action").value;
+        let force = document.getElementById("force").checked;
+        let message = document.getElementById("message").value;
+        let command = "shutdown ";
+        // Tijd omzetten naar seconden
+        if (time) {
+          command += `-t ${time} `;
+        }
+        if (action === "restart") {
+          command += "-r ";
+        }
+		if (action === "shutdown") {
+          command += "-s ";
+        }
+        if (force) {
+          command += "-f ";
+        }
+        if (message) {
+          command += `-c "${message}" `;
+        }
+        document.getElementById("commandOutput").innerText = command;
+      }
+    </script>
+  </body>
+</html>
