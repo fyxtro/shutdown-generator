@@ -26,7 +26,7 @@ The Shutdown Command Generator is a simple web application designed to create cu
 - [Flatpickr JS](https://flatpickr.js.org/) for the time picker.
 
 ## Author
-[Your Name]
+Quinten
 
 ## License
 This project is licensed under the [MIT License](LICENSE).
